@@ -1,0 +1,59 @@
+{
+  "categories": [
+    {
+      "name": "Signature Cocktails",
+      "items": [
+        {
+          "name": "Purple Rain",
+          "description": "Gin, Lavendel, Zitrone, Veilchen",
+          "price": "12€"
+        },
+        {
+          "name": "Smoky Garage",
+          "description": "Whisky, geräucherte Eiswürfel, Ahornsirup",
+          "price": "14€"
+        },
+        {
+          "name": "Citrus Breeze",
+          "description": "Vodka, Grapefruit, Ingwer, Rosmarin",
+          "price": "11€"
+        }
+      ]
+    },
+    {
+      "name": "Classics",
+      "items": [
+        {
+          "name": "Old Fashioned",
+          "description": "Bourbon, Zucker, Angostura",
+          "price": "10€"
+        },
+        {
+          "name": "Negroni",
+          "description": "Gin, Campari, roter Wermut",
+          "price": "9€"
+        },
+        {
+          "name": "Mojito",
+          "description": "Rum, Limette, Minze, Soda",
+          "price": "8€"
+        }
+      ]
+    },
+    {
+      "name": "Mocktails",
+      "items": [
+        {
+          "name": "Virgin Passion",
+          "description": "Passionsfrucht, Limette, Vanille",
+          "price": "7€"
+        },
+        {
+          "name": "Berry Smash",
+          "description": "Beerenmix, Minze, Soda",
+          "price": "7€"
+        }
+      ]
+    }
+  ]
+}
