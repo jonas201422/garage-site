@@ -25,7 +25,8 @@ document.addEventListener('DOMContentLoaded', () => {
   if (galleryGrid) {
     galleryImages.forEach((src) => {
       const img = document.createElement('img');
-      img.src = `assets/img/${src}`;
+      // Since assets are placed in the repository root on GitHub Pages, use relative filenames directly
+      img.src = `${src}`;
       img.alt = 'Garage Bar Galerie';
       galleryGrid.appendChild(img);
     });
@@ -48,7 +49,8 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Menü laden und rendern
-  fetch('assets/js/menu.json')
+  // Load the menu JSON from the repository root rather than the assets path
+  fetch('menu.json')
     .then((response) => response.json())
     .then((data) => {
       const menuList = document.getElementById('menu-list');
