@@ -1,165 +1,185 @@
 <!DOCTYPE html>
 <html lang="de">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Garage Bar &amp; Lounge</title>
-  <!-- Google Fonts -->
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&amp;family=Playfair+Display:wght@600;700&amp;display=swap" rel="stylesheet" />
-  <!-- The stylesheet lives in the repository root on GitHub Pages -->
-  <link rel="stylesheet" href="style.css" />
-  <!-- GSAP for animations -->
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-  <!-- main.js lives in the repository root on GitHub Pages -->
-  <script defer src="main.js"></script>
-</head>
-<body>
-  <header id="header">
-    <div class="logo">
-      <!-- Logo is stored at the repository root on GitHub Pages -->
-      <img src="logo.jpg" alt="Garage Logo" />
-      <span>Garage</span>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Garage Bar &amp; Lounge – Dark Mode Redesign</title>
+    <!-- Google Font for modern, readable typography -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- Core stylesheet for the dark redesign -->
+    <link rel="stylesheet" href="style.css" />
+    <!-- Script to power interactivity (navigation, gallery, menu rendering, etc.) -->
+    <script defer src="main.js"></script>
+  </head>
+  <body>
+    <header class="header">
+      <div class="logo">
+        <img src="logo.jpg" alt="Garage Logo" />
+        <span>Garage</span>
+      </div>
+      <nav class="nav">
+        <a href="#hero">Home</a>
+        <a href="#about">Über&nbsp;uns</a>
+        <a href="#gallery">Galerie</a>
+        <a href="#events">Events</a>
+        <a href="#menu">Getränke</a>
+        <a href="#reservation">Reservierung</a>
+        <a href="#contact">Kontakt</a>
+      </nav>
+      <button class="nav-toggle" aria-label="Navigation umschalten"><span></span></button>
+    </header>
+
+    <main>
+      <!-- Hero section with video background and prominent messaging -->
+      <section id="hero" class="hero">
+        <video class="hero-video" autoplay muted loop playsinline>
+          <source src="background.mp4" type="video/mp4" />
+        </video>
+        <div class="hero-overlay">
+          <h1>Erleben Sie Exquisite&nbsp;Cocktails</h1>
+          <p>
+            Die Garage verbindet elegante Bar‑Atmosphäre mit exklusiven Events im Herzen der
+            Stadt.
+          </p>
+          <div class="hero-actions">
+            <a href="#reservation" class="btn btn-primary">Tisch reservieren</a>
+            <a href="#menu" class="btn btn-secondary">Getränkekarte</a>
+          </div>
+        </div>
+      </section>
+
+      <!-- About section -->
+      <section id="about" class="section">
+        <div class="container">
+          <h2>Über uns</h2>
+          <p>
+            Seit unserer Gründung steht die Garage Bar &amp; Lounge für erstklassige Cocktails,
+            einzigartige Veranstaltungen und ein Ambiente, das seinesgleichen sucht.
+            Unser Team aus passionierten Bartendern kreiert innovativen Genuss mit Liebe
+            zum Detail.
+          </p>
+        </div>
+      </section>
+
+      <!-- Gallery section where images are injected via JavaScript -->
+      <section id="gallery" class="section">
+        <div class="container">
+          <h2>Galerie</h2>
+          <div class="gallery-grid"></div>
+        </div>
+      </section>
+
+      <!-- Events section with sample event cards -->
+      <section id="events" class="section">
+        <div class="container">
+          <h2>Events</h2>
+          <div class="events-grid">
+            <div class="event-card">
+              <h3>Live DJ</h3>
+              <p>
+                Jeden Freitag und Samstag sorgt unser Resident‑DJ für den perfekten
+                Soundtrack.
+              </p>
+            </div>
+            <div class="event-card">
+              <h3>After&nbsp;Work</h3>
+              <p>
+                Donnerstags von 17–20 Uhr: Signature Drinks &amp; Snacks zum
+                Wohlfühlpreis.
+              </p>
+            </div>
+            <div class="event-card">
+              <h3>Thematische Nächte</h3>
+              <p>
+                Von Salsa bis Electro – regelmäßig wechselnde Themenabende sorgen
+                für Abwechslung.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Menu section rendered from external JSON file -->
+      <section id="menu" class="section">
+        <div class="container">
+          <h2>Getränkekarte</h2>
+          <div id="menu-list"></div>
+        </div>
+      </section>
+
+      <!-- Reservation section with form -->
+      <section id="reservation" class="section">
+        <div class="container">
+          <h2>Reservierung</h2>
+          <form id="reservationForm">
+            <div class="form-row">
+              <label for="res-name">Name</label>
+              <input type="text" id="res-name" required />
+            </div>
+            <div class="form-row">
+              <label for="res-email">E‑Mail</label>
+              <input type="email" id="res-email" required />
+            </div>
+            <div class="form-row">
+              <label for="res-date">Datum</label>
+              <input type="date" id="res-date" required />
+            </div>
+            <div class="form-row">
+              <label for="res-time">Uhrzeit</label>
+              <input type="time" id="res-time" required />
+            </div>
+            <div class="form-row">
+              <label for="res-guests">Personenanzahl</label>
+              <input type="number" id="res-guests" min="1" required />
+            </div>
+            <button type="submit" class="btn btn-primary">Reservierung senden</button>
+          </form>
+        </div>
+      </section>
+
+      <!-- Contact section -->
+      <section id="contact" class="section">
+        <div class="container">
+          <h2>Kontakt</h2>
+          <div class="contact-info">
+            <p>Adresse: Example Straße 1, 12345 Musterstadt</p>
+            <p>
+              E‑Mail:
+              <a href="mailto:info@garage-bar.de">info@garage-bar.de</a>
+            </p>
+            <p>
+              Telefon:
+              <a href="tel:01234567890">01234&nbsp;567890</a>
+            </p>
+          </div>
+          <div class="map">
+            <iframe
+              title="Garage auf Karte"
+              width="100%"
+              height="300"
+              style="border: 0"
+              loading="lazy"
+              src="https://www.openstreetmap.org/export/embed.html?bbox=13.403%2C52.49%2C13.41%2C52.51&layer=mapnik&marker=52.5%2C13.405"
+            ></iframe>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+      <div class="container">
+        <p>&copy;&nbsp;2025 Garage&nbsp;Bar &amp;&nbsp;Lounge.</p>
+      </div>
+    </footer>
+
+    <!-- Lightbox for gallery -->
+    <div id="lightbox" class="lightbox hidden">
+      <span class="close">&times;</span>
+      <img class="lightbox-content" alt="Galerie Bild" />
     </div>
-    <nav id="nav">
-      <a href="#hero">Home</a>
-      <a href="#about">Über uns</a>
-      <a href="#gallery">Galerie</a>
-      <a href="#events">Events</a>
-      <a href="#menu">Getränkekarte</a>
-      <a href="#reservation">Reservierung</a>
-      <a href="#contact">Kontakt</a>
-    </nav>
-    <button id="navToggle" aria-label="Navigation umschalten"><span></span></button>
-  </header>
-
-  <main>
-    <section id="hero">
-      <video class="hero-video" autoplay muted loop playsinline>
-        <!-- Background video stored at the repository root on GitHub Pages -->
-        <source src="background.mp4" type="video/mp4" />
-      </video>
-      <div class="overlay">
-        <h1>Willkommen in der Garage</h1>
-        <p>Erleben Sie exklusive Drinks &amp; Events in stilvoller Atmosphäre.</p>
-        <div class="hero-cta">
-          <a href="#reservation" class="btn primary">Tisch reservieren</a>
-          <a href="#menu" class="btn secondary">Zur Getränkekarte</a>
-        </div>
-      </div>
-    </section>
-
-    <section id="about">
-      <div class="container">
-        <h2>Über uns</h2>
-        <p>
-          Die Garage Bar &amp; Lounge steht für erstklassige Cocktails, einzigartige
-          Events und ein Ambiente, das seinesgleichen sucht. Unser Team aus
-          passionierten Barkeepern kreiert innovative Drinks mit Liebe zum
-          Detail. Die stilvolle Einrichtung mit klaren Linien, warmen Farben
-          und ausgewählten Design-Highlights schafft einen Ort zum Wohlfühlen
-          und Genießen.
-        </p>
-      </div>
-    </section>
-
-    <section id="gallery">
-      <div class="container">
-        <h2>Galerie</h2>
-        <div class="gallery-grid">
-          <!-- Bilder werden via JS eingefügt -->
-        </div>
-      </div>
-    </section>
-
-    <section id="events">
-      <div class="container">
-        <h2>Events</h2>
-        <div class="events-grid">
-          <div class="event-card">
-            <h3>Live&nbsp;DJ</h3>
-            <p>Jeden Freitag und Samstag sorgt unser Resident&nbsp;DJ für den perfekten Soundtrack.</p>
-          </div>
-          <div class="event-card">
-            <h3>After&nbsp;Work</h3>
-            <p>Donnerstags von 17–20&nbsp;Uhr: Spezialdrinks und Snacks zum Wohlfühlpreis.</p>
-          </div>
-          <div class="event-card">
-            <h3>Thematische Nächte</h3>
-            <p>Von Salsa bis Electro – regelmäßig wechselnde Themenabende.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="menu">
-      <div class="container">
-        <h2>Getränkekarte</h2>
-        <div id="menu-list"><!-- wird via JS gerendert --></div>
-      </div>
-    </section>
-
-    <section id="reservation">
-      <div class="container">
-        <h2>Reservierung</h2>
-        <form id="reservationForm">
-          <div class="form-row">
-            <label for="res-name">Name</label>
-            <input type="text" id="res-name" required />
-          </div>
-          <div class="form-row">
-            <label for="res-email">E‑Mail</label>
-            <input type="email" id="res-email" required />
-          </div>
-          <div class="form-row">
-            <label for="res-date">Datum</label>
-            <input type="date" id="res-date" required />
-          </div>
-          <div class="form-row">
-            <label for="res-time">Uhrzeit</label>
-            <input type="time" id="res-time" required />
-          </div>
-          <div class="form-row">
-            <label for="res-guests">Personenanzahl</label>
-            <input type="number" id="res-guests" min="1" required />
-          </div>
-          <button type="submit" class="btn primary">Reservierung senden</button>
-        </form>
-      </div>
-    </section>
-
-    <section id="contact">
-      <div class="container">
-        <h2>Kontakt</h2>
-        <div class="contact-info">
-          <p>Adresse: Example&nbsp;Straße&nbsp;1, 12345 Musterstadt</p>
-          <p>E‑Mail: <a href="mailto:info@garage-bar.de">info@garage-bar.de</a></p>
-          <p>Telefon: <a href="tel:01234567890">01234&nbsp;567890</a></p>
-        </div>
-        <div class="map">
-          <iframe
-            title="Garage auf Karte"
-            width="100%"
-            height="300"
-            style="border:0"
-            loading="lazy"
-            src="https://www.openstreetmap.org/export/embed.html?bbox=13.403%2C52.49%2C13.41%2C52.51&amp;layer=mapnik&amp;marker=52.5%2C13.405"
-          ></iframe>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer>
-    <div class="container">
-      <p>&copy;&nbsp;2025 Garage&nbsp;Bar&nbsp;&amp;&nbsp;Lounge. Alle Rechte vorbehalten.</p>
-    </div>
-  </footer>
-
-  <!-- Lightbox für Galerie -->
-  <div id="lightbox" class="lightbox hidden">
-    <span class="close">&times;</span>
-    <img class="lightbox-content" alt="Galerie Bild" />
-  </div>
-</body>
+  </body>
 </html>

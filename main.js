@@ -1,18 +1,18 @@
-// Haupt-JavaScript für die Garage Bar & Lounge Website
-// Verarbeitet Navigation, Galerie, Menü und Reservierungsformular
+// Script to power interactivity for the Garage dark redesign
+// Handles mobile navigation, gallery generation, menu rendering, reservations and reveal animations
 
 document.addEventListener('DOMContentLoaded', () => {
-  // Navigation Toggle für mobile Ansicht
-  const navToggle = document.getElementById('navToggle');
-  const nav = document.getElementById('nav');
-  if (navToggle) {
+  // Mobile navigation toggle
+  const navToggle = document.querySelector('.nav-toggle');
+  const nav = document.querySelector('.nav');
+  if (navToggle && nav) {
     navToggle.addEventListener('click', () => {
       nav.classList.toggle('open');
       navToggle.classList.toggle('open');
     });
   }
 
-  // Galerie dynamisch generieren
+  // Dynamically populate gallery with selected images
   const galleryImages = [
     'atmosphere1.jpg',
     'atmosphere2.jpg',
@@ -25,14 +25,13 @@ document.addEventListener('DOMContentLoaded', () => {
   if (galleryGrid) {
     galleryImages.forEach((src) => {
       const img = document.createElement('img');
-      // Since assets are placed in the repository root on GitHub Pages, use relative filenames directly
       img.src = `${src}`;
       img.alt = 'Garage Bar Galerie';
       galleryGrid.appendChild(img);
     });
   }
 
-  // Lightbox für Galerie
+  // Lightbox for gallery
   const lightbox = document.getElementById('lightbox');
   const lightboxImg = lightbox ? lightbox.querySelector('.lightbox-content') : null;
   if (galleryGrid && lightbox && lightboxImg) {
@@ -48,8 +47,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Menü laden und rendern
-  // Load the menu JSON from the repository root rather than the assets path
+  // Load menu from JSON and render into the menu section
   fetch('menu.json')
     .then((response) => response.json())
     .then((data) => {
@@ -64,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const list = document.createElement('ul');
         cat.items.forEach((item) => {
           const li = document.createElement('li');
-          li.innerHTML = `<strong>${item.name}</strong><span class="price">${item.price}</span><p>${item.description}</p>`;
+          li.innerHTML = `\n            <strong>${item.name}</strong>\n            <span class="price">${item.price}</span>\n            <p>${item.description}</p>\n          `;
           list.appendChild(li);
         });
         catDiv.appendChild(list);
@@ -72,10 +70,10 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     })
     .catch((err) => {
-      console.error('Konnte Menü nicht laden', err);
+      console.error('Konnte die Getränkekarte nicht laden', err);
     });
 
-  // Reservierungsformular: erstelle Mailto-Link
+  // Reservation form: create mailto link
   const resForm = document.getElementById('reservationForm');
   if (resForm) {
     resForm.addEventListener('submit', (e) => {
@@ -89,24 +87,24 @@ document.addEventListener('DOMContentLoaded', () => {
       const body = encodeURIComponent(
         `Name: ${name}\nE-Mail: ${email}\nDatum: ${date}\nUhrzeit: ${time}\nPersonen: ${guests}`
       );
-      // Öffnet den Mailclient des Nutzers mit den Details
       window.location.href = `mailto:info@garage-bar.de?subject=${subject}&body=${body}`;
     });
   }
 
-  // Sanfte Scrollanimations mit GSAP
-  if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
-    gsap.utils.toArray('section').forEach((sec) => {
-      gsap.from(sec.querySelector('h2'), {
-        scrollTrigger: {
-          trigger: sec,
-          start: 'top 80%',
-        },
-        y: 50,
-        opacity: 0,
-        duration: 0.6,
-        ease: 'power2.out',
+  // Reveal animations: fade sections into view on scroll
+  const observer = new IntersectionObserver(
+    (entries, obs) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          obs.unobserve(entry.target);
+        }
       });
-    });
-  }
+    },
+    { threshold: 0.2 }
+  );
+  document.querySelectorAll('.section').forEach((sec) => {
+    sec.classList.add('reveal');
+    observer.observe(sec);
+  });
 });
