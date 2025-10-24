@@ -1,162 +1,112 @@
-const express = require('express');
-const nodemailer = require('nodemailer');
-const { google } = require('googleapis');
-const cors = require('cors');
+import express from "express";
+import { google } from "googleapis";
+import dotenv from "dotenv";
+import bodyParser from "body-parser";
+
+dotenv.config();
 
 const app = express();
-app.use(cors());
-app.use(express.json());
+app.use(bodyParser.json());
 
-// configure mail transporter
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.MAIL_USER,
-    pass: process.env.MAIL_PASS,
-  },
+const {
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
+  GOOGLE_CALENDAR_ID,
+} = process.env;
+
+// OAuth2 client setup
+const oAuth2Client = new google.auth.OAuth2(
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
+  "http://localhost:3000/oauth2callback"
+);
+
+// Endpoint to initiate OAuth flow
+app.get("/auth", (req, res) => {
+  const url = oAuth2Client.generateAuthUrl({
+    access_type: "offline",
+    scope: ["https://www.googleapis.com/auth/calendar.events"],
+  });
+  res.redirect(url);
 });
 
-// configure Google Calendar API with service account credentials
-const credentials = process.env.GOOGLE_CREDENTIALS
-  ? JSON.parse(process.env.GOOGLE_CREDENTIALS)
-  : null;
-
-let calendar;
-if (credentials) {
-  const auth = new google.auth.JWT({
-    email: credentials.client_email,
-    key: credentials.private_key,
-    scopes: ['https://www.googleapis.com/auth/calendar'],
-  });
-  calendar = google.calendar({ version: 'v3', auth });
-}
-
-app.post('/api/reservieren', async (req, res) => {
-  const { name, email, phone, datum, uhrzeit, personen, nachricht } = req.body;
-
+// OAuth2 callback endpoint
+app.get("/oauth2callback", async (req, res) => {
+  const { code } = req.query;
   try {
-    // Send notification email
-    await transporter.sendMail({
-      from: `"Garage Reservations" <${process.env.MAIL_USER}>`,
-      to: process.env.MAIL_TO || process.env.MAIL_USER,
-      subject: `Neue Reservierung von ${name}`,
-      html: `
-        <h3>Neue Reservierung</h3>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>E-Mail:</strong> ${email}</p>
-        <p><strong>Telefon:</strong> ${phone || ''}</p>
-        <p><strong>Datum:</strong> ${datum}</p>
-        <p><strong>Uhrzeit:</strong> ${uhrzeit}</p>
-        <p><strong>Personen:</strong> ${personen}</p>
-        <p><strong>Nachricht:</strong> ${nachricht || ''}</p>
-      `,
-  const express = require('express');
-const nodemailer = require('nodemailer');
-const { google } = require('googleapis');
-const cors = require('cors');
-
-const app = express();
-app.use(cors());
-app.use(express.json());
-
-// configure mail transporter
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.MAIL_USER,
-    pass: process.env.MAIL_PASS,
-  },
+    const { tokens } = await oAuth2Client.getToken(code);
+    oAuth2Client.setCredentials(tokens);
+    res.send(
+      "Autorisierung erfolgreich! Sie können dieses Fenster schließen."
+    );
+  } catch (err) {
+    console.error("Error retrieving access token", err);
+    res
+      .status(500)
+      .send("Fehler beim Abrufen des Zugangstokens: " + err.message);
+  }
 });
 
-// configure Google Calendar API with service account credentials
-const credentials = process.env.GOOGLE_CREDENTIALS
-  ? JSON.parse(process.env.GOOGLE_CREDENTIALS)
-  : null;
+// Reservation endpoint
+app.post("/reserve", async (req, res) => {
+  const { name, email, phone, date, time, guests, message } = req.body;
 
-let calendar;
-if (credentials) {
-  const auth = new google.auth.JWT({
-    email: credentials.client_email,
-    key: credentials.private_key,
-    scopes: ['https://www.googleapis.com/auth/calendar'],
-  });
-  calendar = google.calendar({ version: 'v3', auth });
-}
-
-app.post('/api/reservieren', async (req, res) => {
-  const { name, email, phone, datum, uhrzeit, personen, nachricht } = req.body;
-
-  try {
-    // Send notification email
-    await transporter.sendMail({
-      from: `"Garage Reservations" <${process.env.MAIL_USER}>`,
-      to: process.env.MAIL_TO || process.env.MAIL_USER,
-      subject: `Neue Reservierung von ${name}`,
-      html: `
-        <h3>Neue Reservierung</h3>
-        <p><strong>Name:</strong> ${name}</p>
-        <p><strong>E-Mail:</strong> ${email}</p>
-        <p><strong>Telefon:</strong> ${phone || ''}</p>
-        <p><strong>Datum:</strong> ${datum}</p>
-        <p><strong>Uhrzeit:</strong> ${uhrzeit}</p>
-        <p><strong>Personen:</strong> ${personen}</p>
-        <p><strong>Nachricht:</strong> ${nachricht || ''}</p>
-      `,
+  // Ensure the OAuth client has credentials
+  if (!oAuth2Client.credentials || !oAuth2Client.credentials.access_token) {
+    return res.status(401).json({
+      success: false,
+      error:
+        "Server ist nicht autorisiert. Bitte rufen Sie /auth auf und autorisieren Sie das Backend.",
     });
+  }
 
-    // Create calendar event if credentials provided
-    if (calendar) {
-      const startDateTime = new Date(`${datum}T${uhrzeit}`);
-      // assume 2 hour reservation
-      const endDateTime = new Date(startDateTime.getTime() + 2 * 60 * 60 * 1000);
+  const calendar = google.calendar({ version: "v3", auth: oAuth2Client });
 
-      await calendar.events.insert({
-        calendarId: process.env.CALENDAR_ID || 'primary',
-        requestBody: {
-          summary: `Reservierung: ${name} (${personen} Personen)`,
-          description: `Name: ${name}\nE-Mail: ${email}\nTelefon: ${phone || ''}\nNachricht: ${nachricht || ''}`,
-          start: { dateTime: startDateTime.toISOString() },
-          end: { dateTime: endDateTime.toISOString() },
-        },
-      });
-    }
+  const startDateTime = `${date}T${time}:00`;
+  const endDateTime = `${date}T${addTwoHours(time)}:00`;
 
-    res.json({ success: true });
+  const event = {
+    summary: `Reservierung – ${name}`,
+    description: `E-Mail: ${email}\nTelefon: ${phone}\nPersonen: ${guests}\nNachricht: ${message}`,
+    start: {
+      dateTime: startDateTime,
+      timeZone: "Europe/Vienna",
+    },
+    end: {
+      dateTime: endDateTime,
+      timeZone: "Europe/Vienna",
+    },
+  };
+
+  try {
+    await calendar.events.insert({
+      calendarId: GOOGLE_CALENDAR_ID,
+      resource: event,
+    });
+    res.json({ success: true, message: "Reservierung im Kalender eingetragen!" });
   } catch (error) {
-    console.error('Fehler bei Reservierung:', error);
-    res.status(500).json({ success: false, error: 'Es gab ein Problem beim Senden der Reservierung.' });
+    console.error("Error inserting event:", error);
+    res.status(500).json({
+      success: false,
+      error: "Fehler beim Eintragen in den Kalender.",
+    });
   }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Server läuft auf Port ${PORT}`);
-});  });
-
-    // Create calendar event if credentials provided
-    if (calendar) {
-      const startDateTime = new Date(`${datum}T${uhrzeit}`);
-      // assume 2 hour reservation
-      const endDateTime = new Date(startDateTime.getTime() + 2 * 60 * 60 * 1000);
-
-      await calendar.events.insert({
-        calendarId: process.env.CALENDAR_ID || 'primary',
-        requestBody: {
-          summary: `Reservierung: ${name} (${personen} Personen)`,
-          description: `Name: ${name}\nE-Mail: ${email}\nTelefon: ${phone || ''}\nNachricht: ${nachricht || ''}`,
-          start: { dateTime: startDateTime.toISOString() },
-          end: { dateTime: endDateTime.toISOString() },
-        },
-      });
-    }
-
-    res.json({ success: true });
-  } catch (error) {
-    console.error('Fehler bei Reservierung:', error);
-    res.status(500).json({ success: false, error: 'Es gab ein Problem beim Senden der Reservierung.' });
+// Helper function to add 2 hours to a HH:MM time string
+function addTwoHours(time) {
+  const [hour, minute] = time.split(":" ).map(Number);
+  let endHour = hour + 2;
+  let endMinute = minute;
+  if (endHour >= 24) {
+    endHour -= 24;
   }
-});
+  return `${endHour.toString().padStart(2, "0")}:${endMinute
+    .toString()
+    .padStart(2, "0")}`;
+}
 
+// Start the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server läuft auf Port ${PORT}`);
