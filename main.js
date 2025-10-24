@@ -29,22 +29,22 @@ document.addEventListener('DOMContentLoaded', () => {
       img.alt = 'Garage Bar Galerie';
       galleryGrid.appendChild(img);
     });
-  }
 
-  // Lightbox for gallery
-  const lightbox = document.getElementById('lightbox');
-  const lightboxImg = lightbox ? lightbox.querySelector('.lightbox-content') : null;
-  if (galleryGrid && lightbox && lightboxImg) {
-    galleryGrid.addEventListener('click', (e) => {
-      if (e.target.tagName === 'IMG') {
-        lightboxImg.src = e.target.src;
-        lightbox.classList.remove('hidden');
-      }
-    });
-    const closeBtn = lightbox.querySelector('.close');
-    closeBtn.addEventListener('click', () => {
-      lightbox.classList.add('hidden');
-    });
+    // Lightbox for gallery
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = lightbox ? lightbox.querySelector('.lightbox-content') : null;
+    if (lightbox && lightboxImg) {
+      galleryGrid.addEventListener('click', (e) => {
+        if (e.target.tagName === 'IMG') {
+          lightboxImg.src = e.target.src;
+          lightbox.classList.remove('hidden');
+        }
+      });
+      const closeBtn = lightbox.querySelector('.close');
+      closeBtn.addEventListener('click', () => {
+        lightbox.classList.add('hidden');
+      });
+    }
   }
 
   // Load menu from JSON and render into the menu section
@@ -62,7 +62,11 @@ document.addEventListener('DOMContentLoaded', () => {
         const list = document.createElement('ul');
         cat.items.forEach((item) => {
           const li = document.createElement('li');
-          li.innerHTML = `\n            <strong>${item.name}</strong>\n            <span class="price">${item.price}</span>\n            <p>${item.description}</p>\n          `;
+          li.innerHTML = `
+            <strong>${item.name}</strong>
+            <span class="price">${item.price}</span>
+            <p>${item.description}</p>
+          `;
           list.appendChild(li);
         });
         catDiv.appendChild(list);
@@ -72,46 +76,48 @@ document.addEventListener('DOMContentLoaded', () => {
     .catch((err) => {
       console.error('Konnte die Getränkekarte nicht laden', err);
     });
-   });
-  }// Reservation form: send data to backend
-const resForm = document.getElementById('reservationForm');
-if (resForm) {
-  resForm.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const name = document.getElementById('res-name').value;
-    const email = document.getElementById('res-email').value;
-    const phone = document.getElementById('res-phone').value;
-    const date = document.getElementById('res-date').value;
-    const time = document.getElementById('res-time').value;
-    const guests = document.getElementById('res-guests').value;
-    const message = document.getElementById('res-message').value;
-    try {
-      const response = await fetch('/api/reservieren', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name,
-          email,
-          phone,
-          datum: date,
-          uhrzeit: time,
-          personen: guests,
-          nachricht: message
-        })
-      });
-      const result = await response.json();
-      if (result.success) {
-        alert('Reservierung erfolgreich gesendet!');
-        resForm.reset();
-      } else {
-        alert('Es ist ein Fehler aufgetreten.');
+
+  // Reservation form: send data to backend
+  const resForm = document.getElementById('reservationForm');
+  if (resForm) {
+    resForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const name = document.getElementById('res-name').value;
+      const email = document.getElementById('res-email').value;
+      const phoneInput = document.getElementById('res-phone');
+      const phone = phoneInput ? phoneInput.value : '';
+      const date = document.getElementById('res-date').value;
+      const time = document.getElementById('res-time').value;
+      const guests = document.getElementById('res-guests').value;
+      const messageInput = document.getElementById('res-message');
+      const message = messageInput ? messageInput.value : '';
+      try {
+        const response = await fetch('/reserve', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name,
+            email,
+            phone,
+            date,
+            time,
+            guests,
+            message
+          })
+        });
+        const result = await response.json();
+        if (result.success) {
+          alert('Reservierung erfolgreich gesendet!');
+          resForm.reset();
+        } else {
+          alert('Es ist ein Fehler aufgetreten.');
+        }
+      } catch (err) {
+        console.error(err);
+        alert('Beim Senden der Reservierung ist ein Fehler aufgetreten.');
       }
-    } catch (err) {
-      console.error(err);
-      alert('Beim Senden der Reservierung ist ein Fehler aufgetreten.');
-    }
-  });
-}
+    });
+  }
 
   // Reveal animations: fade sections into view on scroll
   const observer = new IntersectionObserver(
