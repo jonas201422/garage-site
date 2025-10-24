@@ -72,24 +72,46 @@ document.addEventListener('DOMContentLoaded', () => {
     .catch((err) => {
       console.error('Konnte die Getränkekarte nicht laden', err);
     });
-
-  // Reservation form: create mailto link
-  const resForm = document.getElementById('reservationForm');
-  if (resForm) {
-    resForm.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const name = document.getElementById('res-name').value;
-      const email = document.getElementById('res-email').value;
-      const date = document.getElementById('res-date').value;
-      const time = document.getElementById('res-time').value;
-      const guests = document.getElementById('res-guests').value;
-      const subject = encodeURIComponent('Reservierungsanfrage');
-      const body = encodeURIComponent(
-        `Name: ${name}\nE-Mail: ${email}\nDatum: ${date}\nUhrzeit: ${time}\nPersonen: ${guests}`
-      );
-      window.location.href = `mailto:info@garage-bar.de?subject=${subject}&body=${body}`;
-    });
-  }
+   });
+  }// Reservation form: send data to backend
+const resForm = document.getElementById('reservationForm');
+if (resForm) {
+  resForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const name = document.getElementById('res-name').value;
+    const email = document.getElementById('res-email').value;
+    const phone = document.getElementById('res-phone').value;
+    const date = document.getElementById('res-date').value;
+    const time = document.getElementById('res-time').value;
+    const guests = document.getElementById('res-guests').value;
+    const message = document.getElementById('res-message').value;
+    try {
+      const response = await fetch('/api/reservieren', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          email,
+          phone,
+          datum: date,
+          uhrzeit: time,
+          personen: guests,
+          nachricht: message
+        })
+      });
+      const result = await response.json();
+      if (result.success) {
+        alert('Reservierung erfolgreich gesendet!');
+        resForm.reset();
+      } else {
+        alert('Es ist ein Fehler aufgetreten.');
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Beim Senden der Reservierung ist ein Fehler aufgetreten.');
+    }
+  });
+}
 
   // Reveal animations: fade sections into view on scroll
   const observer = new IntersectionObserver(
