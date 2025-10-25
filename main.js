@@ -92,7 +92,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const messageInput = document.getElementById('res-message');
       const message = messageInput ? messageInput.value : '';
       try {
-        const response = await fetch('/reserve', {
+        const response = await fetch("https://garage-site-mhr1.onrender.com/reserve", {
+
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
